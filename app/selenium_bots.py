@@ -74,6 +74,13 @@ class YandexSelenium(Webdriver):
         email_input.send_keys(Settings.EMAIL_PASSWORD)
         enter_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'passp:sign-in')))
         enter_button.click()
+        time.sleep(1)
+        try:
+            self.driver.find_element_by_id('passp-field-phoneNumber')  # Если Яндекс просит подтвердить телефон
+            skip = self.driver.find_element_by_css_selector('button[data-t="button:pseudo"]')
+            skip.click()
+        except NoSuchElementException:
+            pass
         self.logger.info('Залогинились в Яндекс')
 
     def yandex_get_newest_mail(self, mail_title):
@@ -84,8 +91,8 @@ class YandexSelenium(Webdriver):
         account_button.click()
         mail_button = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'menu__list-item')))
         mail_button.click()
-        self.logger.info('Ждем прибытия письма 21 сек ...')
-        time.sleep(21)  # подождать, пока письмо не придет.
+        self.logger.info('Ждем прибытия письма 23 сек ...')
+        time.sleep(23)  # подождать, пока письмо не придет.
         first_mail = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'ns-view-messages-item-wrap')))
         if mail_title in first_mail.text:
             first_mail.click()
