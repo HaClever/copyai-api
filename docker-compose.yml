@@ -1,0 +1,13 @@
+version: "3.5"
+
+services:
+  copyai:
+    build:
+      context: app/
+      dockerfile: Dockerfile
+    container_name: copyai
+    command: uvicorn main:app --host 0.0.0.0 --port 777
+    env_file:
+      - .env
+    ports:
+      - 777:777
