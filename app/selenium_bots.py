@@ -142,6 +142,7 @@ class CopyAiSelenium(YandexSelenium):
         self.open_new_tab()
         self.login_to_yandex_mail()
         message = self.yandex_get_newest_mail('Log in to CopyAI')
+        time.sleep(0.5)
         for strong in message.find_elements_by_tag_name('strong'):
             if strong.text == 'Log in to CopyAI':
                 strong.click()
