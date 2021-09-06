@@ -11,3 +11,5 @@ services:
       - .env
     ports:
       - 777:777
+    volumes: 
+      - ./error_screenshots:/app/error_screenshots

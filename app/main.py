@@ -3,7 +3,17 @@ from fastapi import FastAPI
 from router import router
 from settings import Settings
 
-app = FastAPI()
+if Settings.ENV == 'PROD':
+    app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+    from docs_security import secure_docs
+    secure_docs(
+        app,
+        admin_username=Settings.DOCS_ADMIN_USERNAME,
+        admin_password=Settings.DOCS_ADMIN_PASSWORD,
+        title='Copyai Selenium'
+    )
+else:
+    app = FastAPI(title='Copyai Selenium')
 
 app.include_router(router)
 

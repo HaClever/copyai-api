@@ -8,6 +8,8 @@ import time
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from settings import Settings
 import pickle
+import pathlib
+from datetime import datetime
 
 class Webdriver:
     logger = None
@@ -31,7 +33,7 @@ class Webdriver:
         options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\
                              (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36')
         options.add_argument("start-maximized")
-        options.add_argument('user-data-dir=./chrome_data')
+        options.add_argument('user-data-dir=../chrome_data')
 
         driver = webdriver.Chrome(  # Объект для управления браузером.
             executable_path=Settings.CHROMEDRIVER_PATH,
@@ -62,8 +64,22 @@ class Webdriver:
         self.driver.get('https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html')
         self.driver.save_screenshot('test.png')
 
-class YandexSelenium(Webdriver):
+    @classmethod
+    def take_screenshot_on_error(cls, func):
+        def save_error_screenshot(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                screenshot_dir_path = pathlib.Path('../error_screenshots')
+                screenshot_dir_path.mkdir(exist_ok=True)
+                round_time = str(datetime.now()).split('.')[0].replace(' ', '-').replace(':', '-')
+                screnshot_path = (f'{str(screenshot_dir_path)}/{type(e).__name__}({round_time}).png')
+                self.driver.save_screenshot(screnshot_path)
+                raise
+        return save_error_screenshot
 
+class YandexSelenium(Webdriver):
+    @Webdriver.take_screenshot_on_error
     def login_to_yandex_mail(self):
         self.driver.get('https://passport.yandex.ru/auth')
         email_input = self.wait.until(EC.presence_of_element_located((By.ID, 'passp-field-login')))
@@ -83,6 +99,7 @@ class YandexSelenium(Webdriver):
             pass
         self.logger.info('Залогинились в Яндекс')
 
+    @Webdriver.take_screenshot_on_error
     def yandex_get_newest_mail(self, mail_title):
         try:
             account_button = self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, 'user-pic')))
@@ -112,6 +129,7 @@ class YandexSelenium(Webdriver):
 
 class CopyAiSelenium(YandexSelenium):
 
+    @Webdriver.take_screenshot_on_error
     def log_in_if_not_loggined(self):
         self.driver.get("https://www.copy.ai/app#")
         try:
@@ -142,7 +160,7 @@ class CopyAiSelenium(YandexSelenium):
         self.open_new_tab()
         self.login_to_yandex_mail()
         message = self.yandex_get_newest_mail('Log in to CopyAI')
-        time.sleep(0.5)
+        time.sleep(1)
         for strong in message.find_elements_by_tag_name('strong'):
             if strong.text == 'Log in to CopyAI':
                 strong.click()
@@ -155,6 +173,7 @@ class CopyAiSelenium(YandexSelenium):
             pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
             self.logger.info('Куки обновлены')
 
+    @Webdriver.take_screenshot_on_error
     def copyai_select_option(self, option):
         # try:
         #     skip_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'skip-button')))
@@ -179,6 +198,7 @@ class CopyAiSelenium(YandexSelenium):
                 self.logger.info(f'Выбрана опция "{option}"')
                 break
 
+    @Webdriver.take_screenshot_on_error
     def copyai_change_language(self):
         input_lang = self.wait.until(EC.presence_of_element_located((By.ID, 'input-lang-text')))
         if 'RU' not in input_lang.text:
@@ -199,6 +219,7 @@ class CopyAiSelenium(YandexSelenium):
                 if lang.get_attribute('data-code') == 'RU':
                     lang.click()
 
+    @Webdriver.take_screenshot_on_error
     def copyai_get_response(self, product_description, product_name=None):
         self.copyai_change_language()
         if product_name:

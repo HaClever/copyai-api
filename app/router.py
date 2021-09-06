@@ -14,7 +14,7 @@ async def login_to_copyai():
 
 
 @router.post('/one_field_tools')
-async def use_one_field_tool(option: OneFieldOption) -> list:
+async def use_one_field_tool(option: OneFieldOption) -> dict:
     """ - Для работы с инструментами, у которых одно поле
     - **Доступные опции**: Instagram Captions, Hashtags, Microcopy, Event Copy, Question Generator, Follow Up Email,
     Confirmation Emails, Video Titles, Carousel Post, Captions, Video Intro Hook, Relatable Experiences,
@@ -24,11 +24,11 @@ async def use_one_field_tool(option: OneFieldOption) -> list:
     """
     copyai.log_in_if_not_loggined()
     copyai.copyai_select_option(option.option.value)
-    return copyai.copyai_get_response(option.field_value)
+    return {'texts': copyai.copyai_get_response(option.field_value)}
 
 
 @router.post('/two_field_tools')
-async def use_two_field_tool(option: TwoFieldOption) -> list:
+async def use_two_field_tool(option: TwoFieldOption) -> dict:
     """ - Для работы с инструментами, у которых два поля
     - **Доступные опции**: Product Descriptions, Facebook Primary Text, Facebook Listicle, Facebook Headlines,
     Facebook Link descriptions, Google Headlines, Google Descriptions, Instagram Product Showcase,
@@ -45,4 +45,4 @@ async def use_two_field_tool(option: TwoFieldOption) -> list:
     """
     copyai.log_in_if_not_loggined()
     copyai.copyai_select_option(option.option.value)
-    return copyai.copyai_get_response(option.main_field_value, option.secondary_field_value)
+    return {'texts': copyai.copyai_get_response(option.main_field_value, option.secondary_field_value)}
