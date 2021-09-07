@@ -33,8 +33,9 @@ class Webdriver:
         options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\
                              (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36')
         options.add_argument("start-maximized")
-        options.add_argument('user-data-dir=../chrome_data')
-
+        # self.logger.info(str(pathlib.Path("/../chrome_data").resolve()))
+        # options.add_argument(f'user-data-dir={str(pathlib.Path("../chrome_data").absolute())}')
+        options.add_argument('user-data-dir=/chrome_data')
         driver = webdriver.Chrome(  # Объект для управления браузером.
             executable_path=Settings.CHROMEDRIVER_PATH,
             chrome_options=options

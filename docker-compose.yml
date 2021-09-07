@@ -12,4 +12,4 @@ services:
     ports:
       - 777:777
     volumes: 
-      - ./error_screenshots:/app/error_screenshots
+      - ./error_screenshots:/error_screenshots

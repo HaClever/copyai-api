@@ -32,6 +32,6 @@ EXPOSE 777
 
 WORKDIR /app
 COPY . /app
-RUN mkdir -p chrome_data && chmod 777 chrome_data
-RUN mkdir -p error_screenshots && chmod 777 error_screenshots
+RUN mkdir -p ../chrome_data && chmod 777 ../chrome_data
+RUN mkdir -p ../error_screenshots && chmod 777 ../error_screenshots
 RUN pip3 install -r requirements.txt
