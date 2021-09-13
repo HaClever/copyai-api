@@ -182,7 +182,12 @@ class CopyAiSelenium(YandexSelenium):
                 pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
                 self.logger.info('Куки обновлены')
         except TimeoutException:
-            self.driver.refresh()
+            self.logger.info('Залогинились в CopyAi')
+            welcome_button = self.driver.find_element_by_id('next-button-welcome')
+            welcome_button.click()
+            pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
+            self.logger.info('Куки обновлены')
+            # self.driver.refresh()
             # self.driver.execute_script("window.history.go(-1)")
 
     @Webdriver.take_screenshot_on_error
