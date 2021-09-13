@@ -31,8 +31,8 @@ class Webdriver:
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('window-size=1920x1080')
-        options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\
-                             (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36')
+        options.add_argument('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)\
+                              Chrome/80.0.3987.87 Safari/537.36')
         options.add_argument('start-maximized')
         options.add_argument('--proxy-server=mitmproxy:8080')
         options.add_argument('--allow-running-insecure-content')
@@ -182,9 +182,11 @@ class CopyAiSelenium(YandexSelenium):
                 pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
                 self.logger.info('Куки обновлены')
         except TimeoutException:
-            self.logger.info('Залогинились в CopyAi')
             welcome_button = self.driver.find_element_by_id('next-button-welcome')
             welcome_button.click()
+            skip_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'skip-button')))
+            skip_button.click()
+            self.logger.info('Залогинились в CopyAi')
             pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
             self.logger.info('Куки обновлены')
             # self.driver.refresh()
