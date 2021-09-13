@@ -170,19 +170,20 @@ class CopyAiSelenium(YandexSelenium):
                     strong.click()
                     break
         except StaleElementReferenceException:
-            message_body = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'js-message-body')))
+            message_body = self.bigger_wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'js-message-body')))
             self.logger.info(f'Messsage text:{message_body.text}')
             raise
         self.driver.switch_to.window(self.driver.window_handles[0])
-        # try:
-        if self.wait.until(EC.text_to_be_present_in_element((By.ID, 'next-button-welcome'), 'Continue')):
-            self.logger.info('Залогинились в CopyAi')
-            welcome_button = self.driver.find_element_by_id('next-button-welcome')
-            welcome_button.click()
-            pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
-            self.logger.info('Куки обновлены')
-        # except TimeoutException:
-        #     self.driver.execute_script("window.history.go(-1)")
+        try:
+            if self.wait.until(EC.text_to_be_present_in_element((By.ID, 'next-button-welcome'), 'Continue')):
+                self.logger.info('Залогинились в CopyAi')
+                welcome_button = self.driver.find_element_by_id('next-button-welcome')
+                welcome_button.click()
+                pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
+                self.logger.info('Куки обновлены')
+        except TimeoutException:
+            self.driver.refresh()
+            # self.driver.execute_script("window.history.go(-1)")
 
     @Webdriver.take_screenshot_on_error
     def copyai_select_option(self, option):
