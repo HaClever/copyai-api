@@ -34,4 +34,5 @@ WORKDIR /app
 COPY . /app
 RUN mkdir -p ../chrome_data && chmod 777 ../chrome_data
 RUN mkdir -p ../error_screenshots && chmod 777 ../error_screenshots
+RUN python3 -m pip install --upgrade pip
 RUN pip3 install -r requirements.txt

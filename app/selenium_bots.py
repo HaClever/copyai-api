@@ -32,9 +32,10 @@ class Webdriver:
         options.add_argument('window-size=1920x1080')
         options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\
                              (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36')
-        options.add_argument("start-maximized")
-        # self.logger.info(str(pathlib.Path("/../chrome_data").resolve()))
-        # options.add_argument(f'user-data-dir={str(pathlib.Path("../chrome_data").absolute())}')
+        options.add_argument('start-maximized')
+        options.add_argument('--proxy-server=mitmproxy:8080')
+        options.add_argument('--allow-running-insecure-content')
+        options.add_argument('--ignore-certificate-errors')
         options.add_argument('user-data-dir=/chrome_data')
         driver = webdriver.Chrome(  # Объект для управления браузером.
             executable_path=Settings.CHROMEDRIVER_PATH,
@@ -161,18 +162,21 @@ class CopyAiSelenium(YandexSelenium):
         self.open_new_tab()
         self.login_to_yandex_mail()
         message = self.yandex_get_newest_mail('Log in to CopyAI')
-        time.sleep(1)
+        time.sleep(2)
         for strong in message.find_elements_by_tag_name('strong'):
             if strong.text == 'Log in to CopyAI':
                 strong.click()
                 break
         self.driver.switch_to.window(self.driver.window_handles[0])
-        if self.bigger_wait.until(EC.text_to_be_present_in_element((By.ID, 'next-button-welcome'), 'Continue')):
-            self.logger.info('Залогинились в CopyAi')
-            welcome_button = self.driver.find_element_by_id('next-button-welcome')
-            welcome_button.click()
-            pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
-            self.logger.info('Куки обновлены')
+        try:
+            if self.wait.until(EC.text_to_be_present_in_element((By.ID, 'next-button-welcome'), 'Continue')):
+                self.logger.info('Залогинились в CopyAi')
+                welcome_button = self.driver.find_element_by_id('next-button-welcome')
+                welcome_button.click()
+                pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
+                self.logger.info('Куки обновлены')
+        except TimeoutException:
+            self.driver.execute_script("window.history.go(-1)")
 
     @Webdriver.take_screenshot_on_error
     def copyai_select_option(self, option):
@@ -239,3 +243,7 @@ class CopyAiSelenium(YandexSelenium):
             if div.get_attribute('original_text'):
                 result.append(div.get_attribute('original_text'))
         return result
+
+if __name__ == '__main__':
+    w = Webdriver()
+    w.check_if_browser_is_detectable()
