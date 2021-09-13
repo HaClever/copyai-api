@@ -170,7 +170,8 @@ class CopyAiSelenium(YandexSelenium):
                     strong.click()
                     break
         except StaleElementReferenceException:
-            self.logger.info(f'Messsage text:{message.text}')
+            message_body = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'js-message-body')))
+            self.logger.info(f'Messsage text:{message_body.text}')
             raise
         self.driver.switch_to.window(self.driver.window_handles[0])
         # try:
