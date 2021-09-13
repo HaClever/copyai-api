@@ -1,4 +1,4 @@
-version: "3.5"
+version: "3.9"
 
 services:
   copyai:
@@ -13,3 +13,12 @@ services:
       - 777:777
     volumes: 
       - ./error_screenshots:/error_screenshots
+
+  mitmproxy:
+    build:
+      context: mitmproxy/
+      dockerfile: Dockerfile
+    container_name: mitmproxy
+    command: mitmdump -p 8080 -s mitm-injector.py -q
+    ports:
+      - 8080:8080
