@@ -5,7 +5,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 import time
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException,\
+    NoSuchElementException, StaleElementReferenceException
 from settings import Settings
 import pickle
 import pathlib
@@ -163,20 +164,24 @@ class CopyAiSelenium(YandexSelenium):
         self.login_to_yandex_mail()
         message = self.yandex_get_newest_mail('Log in to CopyAI')
         time.sleep(2)
-        for strong in message.find_elements_by_tag_name('strong'):
-            if strong.text == 'Log in to CopyAI':
-                strong.click()
-                break
-        self.driver.switch_to.window(self.driver.window_handles[0])
         try:
-            if self.wait.until(EC.text_to_be_present_in_element((By.ID, 'next-button-welcome'), 'Continue')):
-                self.logger.info('Залогинились в CopyAi')
-                welcome_button = self.driver.find_element_by_id('next-button-welcome')
-                welcome_button.click()
-                pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
-                self.logger.info('Куки обновлены')
-        except TimeoutException:
-            self.driver.execute_script("window.history.go(-1)")
+            for strong in message.find_elements_by_tag_name('strong'):
+                if strong.text == 'Log in to CopyAI':
+                    strong.click()
+                    break
+        except StaleElementReferenceException:
+            self.logger.info(f'Messsage text:{message.text}')
+            raise
+        self.driver.switch_to.window(self.driver.window_handles[0])
+        # try:
+        if self.wait.until(EC.text_to_be_present_in_element((By.ID, 'next-button-welcome'), 'Continue')):
+            self.logger.info('Залогинились в CopyAi')
+            welcome_button = self.driver.find_element_by_id('next-button-welcome')
+            welcome_button.click()
+            pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
+            self.logger.info('Куки обновлены')
+        # except TimeoutException:
+        #     self.driver.execute_script("window.history.go(-1)")
 
     @Webdriver.take_screenshot_on_error
     def copyai_select_option(self, option):
