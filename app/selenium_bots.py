@@ -32,7 +32,7 @@ class Webdriver:
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('window-size=1920x1080')
         options.add_argument('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko)\
-                              Chrome/80.0.3987.87 Safari/537.36')
+                               Chrome/80.0.3987.87 Safari/537.36')
         options.add_argument('start-maximized')
         options.add_argument('--proxy-server=mitmproxy:8080')
         options.add_argument('--allow-running-insecure-content')
@@ -186,6 +186,7 @@ class CopyAiSelenium(YandexSelenium):
             welcome_button.click()
             skip_button = self.wait.until(EC.element_to_be_clickable((By.ID, 'skip-button')))
             skip_button.click()
+            time.sleep(5)
             self.logger.info('Залогинились в CopyAi')
             pickle.dump(self.driver.get_cookies(), open(Settings.COOKIES_PATH, "wb"))  # Сохранение куки
             self.logger.info('Куки обновлены')
