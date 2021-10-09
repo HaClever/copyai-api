@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 
 http_basic = HTTPBasic(auto_error=True)
 
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def secure_docs(
@@ -16,8 +16,8 @@ def secure_docs(
     admin_username: str,
     admin_password: str,
     title: str,
-    docs_url: str = '/docs',
-    openapi_url: str = '/openapi.json',
+    docs_url: str = "/docs",
+    openapi_url: str = "/openapi.json",
 ):
     """Hides documentation behind Basic Auth"""
     admin_username = pwd_context.hash(admin_username)
@@ -26,19 +26,22 @@ def secure_docs(
     def get_admin_user(
         credentials: HTTPBasicCredentials = Depends(http_basic),
     ):
-        if pwd_context.verify(credentials.username, admin_username)\
-                and pwd_context.verify(credentials.password, admin_password):
+        if pwd_context.verify(
+            credentials.username, admin_username
+        ) and pwd_context.verify(credentials.password, admin_password):
             return
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Not authenticated',
-            headers={'WWW-Authenticate': 'Basic'},
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Basic"},
         )
 
-    @app.get(openapi_url, include_in_schema=False, dependencies=[Depends(get_admin_user)])
+    @app.get(
+        openapi_url, include_in_schema=False, dependencies=[Depends(get_admin_user)]
+    )
     async def get_open_api_endpoint():
         return JSONResponse(
-            get_openapi(title=title, version='1.0.0', routes=app.routes)
+            get_openapi(title=title, version="2.0.0", routes=app.routes)
         )
 
     @app.get(docs_url, include_in_schema=False, dependencies=[Depends(get_admin_user)])

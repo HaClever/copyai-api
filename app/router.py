@@ -7,29 +7,32 @@ copyai = CopyAiSelenium()
 router = APIRouter()
 
 
-@router.get('/login')
+@router.get("/login")
 async def login_to_copyai():
-    """ Логин в Copy.ai"""
+    """Логин в Copy.ai"""
     copyai.log_in_if_not_loggined()
 
 
-@router.post('/one_field_tools')
+@router.post("/one_field_tools")
 async def use_one_field_tool(option: OneFieldOption) -> dict:
-    """ - Для работы с инструментами, у которых одно поле
+    """- Для работы с инструментами, у которых одно поле
     - **Доступные опции**: Instagram Captions, Hashtags, Microcopy, Event Copy, Question Generator, Follow Up Email,
     Confirmation Emails, Video Titles, Carousel Post, Captions, Video Intro Hook, Relatable Experiences,
     Brainstorm Topics, Bullet Points, Keyword Generator, Add Emoji to List, Simplify Sentence, Verb Booster,
     Adjective Accelerator, Analogy Generator, Two Sentence Stories, Hero Story Intro, Cliffhanger,
     Explain In Plain English, Passive to Active Voice, Name Generator, Startup Ideas, Shower Thoughts, Clubhouse Bio
+    - **Список тонов**:  Friendly, Laxury, Relaxed, Professional, Bold, Adventurous, Witty, Persuasive, Empathetic
     """
     copyai.log_in_if_not_loggined()
+    copyai.enter_project()
+    copyai.copyai_change_language(option.tone)
     copyai.copyai_select_option(option.option.value)
-    return {'texts': copyai.copyai_get_response(option.field_value)}
+    return {"texts": copyai.copyai_get_response(option.field_value)}
 
 
-@router.post('/two_field_tools')
+@router.post("/two_field_tools")
 async def use_two_field_tool(option: TwoFieldOption) -> dict:
-    """ - Для работы с инструментами, у которых два поля
+    """- Для работы с инструментами, у которых два поля
     - **Доступные опции**: Product Descriptions, Facebook Primary Text, Facebook Listicle, Facebook Headlines,
     Facebook Link descriptions, Google Headlines, Google Descriptions, Instagram Product Showcase,
     Linkedln Text Ads, General Ad Copy, Ad Copy Variants, Value Proposition, Motto Generator, Brand Mission,
@@ -42,7 +45,14 @@ async def use_two_field_tool(option: TwoFieldOption) -> dict:
     Change Tone, Sentence Rewriter, Essay Outline, Essay Intro, Bullet Points to Essay, Rewrite with KeyWords,
     Press Release Intros, Hero Story Villian, Viral Ideas, Grows Ideas, Next Producs, Cover Letter, Resume Bullet Points,
     Love Letter, Mother's Day, Birsday Cards
+    - **Список тонов**:  Friendly, Laxury, Relaxed, Professional, Bold, Adventurous, Witty, Persuasive, Empathetic
     """
     copyai.log_in_if_not_loggined()
+    copyai.enter_project()
+    copyai.copyai_change_language(option.tone)
     copyai.copyai_select_option(option.option.value)
-    return {'texts': copyai.copyai_get_response(option.main_field_value, option.secondary_field_value)}
+    return {
+        "texts": copyai.copyai_get_response(
+            option.main_field_value, option.secondary_field_value
+        )
+    }
