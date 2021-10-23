@@ -145,9 +145,9 @@ class YandexSelenium(Webdriver):
         self.wait.until(
             EC.element_to_be_clickable((By.CLASS_NAME, "menu__list-item"))
         ).click()
-        self.wait.until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[data-title="Рассылки"]'))
-        ).click()  # Письмо от copy.ai теперь в рассылке
+        # self.wait.until(
+        #     EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[data-title="Рассылки"]'))
+        # ).click()  # Письмо от copy.ai теперь в рассылке
         self.logger.info("Ждем прибытия письма 30 сек ...")
         time.sleep(30)  # подождать, пока письмо не придет.
         first_mail = self.wait.until(

@@ -11,10 +11,10 @@ if Settings.ENV == "PROD":
         app,
         admin_username=Settings.DOCS_ADMIN_USERNAME,
         admin_password=Settings.DOCS_ADMIN_PASSWORD,
-        title="Copyai Selenium",
+        title="HaClever AI",
     )
 else:
-    app = FastAPI(title="Copyai Selenium", version="2.0.0")
+    app = FastAPI(title="HaClever AI", version="2.0.0")
 
 app.include_router(router)
 
