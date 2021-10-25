@@ -101,7 +101,7 @@ class TwoFieldOptions(Enum):
 
 class Tone(Enum):
     friendly = "Friendly"
-    laxury = "Laxury"
+    luxury = "Luxury"
     relaxed = "Relaxed"
     prodessional = "Professional"
     bold = "Bold"

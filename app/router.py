@@ -45,7 +45,7 @@ async def use_two_field_tool(option: TwoFieldOption) -> dict:
     Change Tone, Sentence Rewriter, Essay Outline, Essay Intro, Bullet Points to Essay, Rewrite with KeyWords,
     Press Release Intros, Hero Story Villian, Viral Ideas, Grows Ideas, Next Producs, Cover Letter, Resume Bullet Points,
     Love Letter, Mother's Day, Birsday Cards
-    - **Список тонов**:  Friendly, Laxury, Relaxed, Professional, Bold, Adventurous, Witty, Persuasive, Empathetic
+    - **Список стилей**:  Friendly, Luxury, Relaxed, Professional, Bold, Adventurous, Witty, Persuasive, Empathetic
     """
     copyai.log_in_if_not_loggined()
     copyai.enter_project()

@@ -15,9 +15,6 @@ class Settings:
     EMAIL: str = os.environ.get("EMAIL")  # поддерживается только Yandex
     EMAIL_PASSWORD: str = os.environ.get("EMAIL_PASSWORD")
 
-    # EMAIL = "chibsc@yandex.ru"  # поддерживается только Yandex
-    # EMAIL_PASSWORD = "Qwertyu11"
-
     PROGECT_TITLE: str = os.environ.get("PROGECT_TITLE", "Soulport")
     RELEVANT_WEBSITE: str = os.environ.get("RELEVANT_WEBSITE", "https://soulport.ru/")
     NUMBER_OF_RETRIES: int = os.environ.get(

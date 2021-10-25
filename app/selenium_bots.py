@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
 import time
 from selenium.common.exceptions import (
     TimeoutException,
@@ -29,8 +30,8 @@ class Webdriver:
         # options.user_data_dir = "./chrome_data"
         # options.headless = True
         # self.driver = uc.Chrome(headless=True)
-        self.driver = self.initialize_browser_driver()
-        self.wait = WebDriverWait(self.driver, 15)
+        self.driver: webdriver.Chrome = self.initialize_browser_driver()
+        self.wait = WebDriverWait(self.driver, 10)
         self.bigger_wait = WebDriverWait(self.driver, 20)
 
     def initialize_browser_driver(self) -> webdriver:
@@ -56,7 +57,7 @@ class Webdriver:
         options.add_argument("--ignore-certificate-errors")
         options.add_argument("user-data-dir=/chrome_data")
         options.add_argument("--log-level=3")
-        driver = webdriver.Chrome(  # Объект для управления браузером.
+        driver = webdriver.Chrome(
             executable_path=Settings.CHROMEDRIVER_PATH, options=options
         )
         return driver
@@ -112,6 +113,10 @@ class YandexSelenium(Webdriver):
     @Webdriver.take_screenshot_on_error
     def login_to_yandex_mail(self):
         self.driver.get("https://passport.yandex.ru/auth")
+        # Удалить куки Яндекса, чтобы не менять сценарий получения письма
+        self.driver.delete_all_cookies()
+        self.driver.refresh()
+
         self.wait.until(
             EC.presence_of_element_located((By.ID, "passp-field-login"))
         ).send_keys(Settings.EMAIL)
@@ -145,9 +150,14 @@ class YandexSelenium(Webdriver):
         self.wait.until(
             EC.element_to_be_clickable((By.CLASS_NAME, "menu__list-item"))
         ).click()
-        # self.wait.until(
-        #     EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[data-title="Рассылки"]'))
-        # ).click()  # Письмо от copy.ai теперь в рассылке
+        try:
+            self.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, 'a[data-title="Рассылки"]')
+                )
+            ).click()  # Письмо от copy.ai теперь в рассылке
+        except TimeoutException:
+            self.logger.info("Старая версия почты")
         self.logger.info("Ждем прибытия письма 30 сек ...")
         time.sleep(30)  # подождать, пока письмо не придет.
         first_mail = self.wait.until(
@@ -194,8 +204,6 @@ class CopyAiSelenium(YandexSelenium):
 
     def login_to_copyai(self):
         self.driver.get("https://app.copy.ai/")
-        # self.upload_cookies_to_browser()
-        # self.driver.get("https://www.copy.ai/app#")
         self.wait.until(
             EC.presence_of_element_located((By.ID, "enter-your-email"))
         ).send_keys(Settings.EMAIL)
@@ -230,6 +238,7 @@ class CopyAiSelenium(YandexSelenium):
         )  # Сохранение куки
         self.logger.info("Куки обновлены")
 
+    @Webdriver.take_screenshot_on_error
     def enter_project(self):
         self.wait.until(
             EC.element_to_be_clickable(
@@ -265,17 +274,26 @@ class CopyAiSelenium(YandexSelenium):
                 (By.CSS_SELECTOR, 'button[data-testid="advanced-settings"]')
             )
         ).click()
-        lang_inputs = self.wait.until(
+        self.wait.until(
             EC.presence_of_all_elements_located((By.CLASS_NAME, "css-yk16xz-control"))
         )
-        self.driver.find_element(By.ID, "react-select-input-language-input").send_keys(
-            "Russian"
+
+        input_lang = self.driver.find_element(
+            By.ID, "react-select-input-language-input"
         )
-        self.driver.find_element(By.ID, "react-select-output-language-input").send_keys(
-            "Russian"
+        input_lang.send_keys("Russian")
+        input_lang.send_keys(Keys.ENTER)
+
+        output_lang = self.driver.find_element(
+            By.ID, "react-select-output-language-input"
         )
-        self.driver.find_element(By.ID, "react-select-tone-input").send_keys(tone.value)
-        lang_inputs[2].click()
+        output_lang.send_keys("Russian")
+        output_lang.send_keys(Keys.ENTER)
+
+        tone_input = self.driver.find_element(By.ID, "react-select-tone-input")
+        tone_input.send_keys(tone.value)
+        tone_input.send_keys(Keys.ENTER)
+
         self.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, 'button[data-testid="apply-advanced-settings"]')
